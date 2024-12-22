@@ -22,8 +22,33 @@
 using namespace std;
 using namespace boost::posix_time;
 
+// Define constants for file paths
+const string POSITION_FILE_PATH = "output/positions.txt";
+const string RISK_FILE_PATH = "output/risk.txt";
+const string STREAMING_FILE_PATH = "output/streaming.txt";
+const string EXECUTIONS_FILE_PATH = "output/executions.txt";
+const string INQUIRIES_FILE_PATH = "output/all_inquiries.txt";
+const string GUI_FILE_PATH = "output/gui.txt";
+
 // Convert the fractional bond price to a numerical price
-double FractionalToPrice(string frac_price)
+/**
+ * @brief Converts a fractional price string to a double price.
+ *
+ * This function takes a string representing a fractional price in the format "X-Y-Z"
+ * where X, Y, and Z are integers. It converts this fractional price to a double value.
+ * The format is assumed to be:
+ * - X: the whole number part
+ * - Y: the numerator of the fractional part (in 32nds)
+ * - Z: the numerator of the fractional part (in 256ths)
+ * 
+ * If the fractional part contains a '+', it is treated as '4'.
+ *
+ * @param frac_price The fractional price string to convert.
+ * @return The converted price as a double.
+ * @throws invalid_argument if the input string cannot be converted to a double.
+ * @throws out_of_range if the input string represents a value out of the range of a double.
+ */
+double ConvertFractionalToPrice(string frac_price)
 {
     double price;
     string s1 = "";
@@ -74,12 +99,12 @@ double FractionalToPrice(string frac_price)
 
 // Connector the the historical position service
 template <typename V>
-class HistoricalPositionConnector :public Connector<Position<V>>
+class HistoricalPositionConnector : public Connector<Position<V>>
 {
 public:
     void Publish(Position<V> data)      // print the position into the file
     {
-        ofstream out("output/positions.txt", ios::app);
+        ofstream out(POSITION_FILE_PATH, ios::app);
         V product = data.GetProduct();
         out << product.GetProductId() << ", ";
         map<string, double> positions = data.GetAllPositions();
@@ -89,36 +114,40 @@ public:
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+    }
 };
 
 
 // Connector to the historical risk service
 template <typename V>
-class HistoricalRiskConnector :public Connector<PV01<V>>
+class HistoricalRiskConnector : public Connector<PV01<V>>
 {
 public:
     void Publish(PV01<V> data)       // print the risk into the file
     {
-        ofstream out("output/risk.txt", ios::app);
+        ofstream out(RISK_FILE_PATH, ios::app);
         V product = data.GetProduct();
         out << product.GetProductId() << ", " << data.GetPV01() << ", "
             << data.GetQuantity() << endl;
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+    } 
 };
 
 
 // Connector to the streaming service
 template<typename V>
-class HistoricalStreamingConnector : public Connector<PriceStream<V> >
+class HistoricalStreamingConnector : public Connector<PriceStream<V>>
 {
 public:
     void Publish(PriceStream<V> data)      // print the price streams into the file
     {
-        ofstream out("output/streaming.txt", ios::app);
+        ofstream out(STREAMING_FILE_PATH, ios::app);
         V product = data.GetProduct();
         PriceStreamOrder bid_order = data.GetBidOrder();
         PriceStreamOrder offer_order = data.GetOfferOrder();
@@ -127,18 +156,20 @@ public:
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+    }     
 };
 
 
 // Connector to the historical execution service
 template<typename V>
-class HistoricalExecutionConnector : public Connector<ExecutionOrder<V> >
+class HistoricalExecutionConnector : public Connector<ExecutionOrder<V>>
 {
 public:
     void Publish(ExecutionOrder<V> data)        // print the execution records into the file
     {
-        ofstream out("output/executions.txt", ios::app);
+        ofstream out(EXECUTIONS_FILE_PATH, ios::app);
         V product = data.GetProduct();
         string side;
         if (data.GetPricingSide() == BID)
@@ -152,18 +183,20 @@ public:
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+    }
 };
 
 
 // Connector to the historical inquiries service
 template<typename V>
-class HistoricalInquiryConnector : public Connector<Inquiry<V> >
+class HistoricalInquiryConnector : public Connector<Inquiry<V>>
 {
 public:
     void Publish(Inquiry<V> data)       // print the inquiry data into the file
     {
-        ofstream out("output/all_inquiries.txt", ios::app);
+        ofstream out(INQUIRIES_FILE_PATH, ios::app);
         string state;
         InquiryState state_enum = data.GetState();
         if (state_enum == RECEIVED)
@@ -184,20 +217,23 @@ public:
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+
+    }    
 };
 
 
 // Connector to the GUI service
 template<typename V>
-class GUIConnector : public Connector<Price<V> >
+class GUIConnector : public Connector<Price<V>>
 {
 public:
     GUIConnector() = default;
 
     void Publish(Price<V>& data)
     {
-        ofstream out("output/gui.txt", ios::app);
+        ofstream out(GUI_FILE_PATH, ios::app);
         ptime cur_time = microsec_clock::local_time();
         V product = data.GetProduct();
         out << cur_time << "  " << product.GetProductId() << ", " << data.GetMid() << ", "
@@ -205,7 +241,9 @@ public:
         out.close();
     }
 
-    void Subscribe(string file_name) {}     // publish only
+    void Subscribe(string file_name) {
+        // This method is intentionally left empty as this connector only supports publishing.
+    }
 };
 
 
@@ -219,7 +257,7 @@ private:
 public:
     TradeBookingConnector(TradeBookingService<V>* _service) : service(_service) {}
 
-    void Publish(Trade<V>& data) {}   // subsribe-only
+    void Publish(Trade<V>& data) {}   // subscribe-only
 
     void Subscribe(string file_name)        // Read trading records from the given file
     {
@@ -242,10 +280,19 @@ public:
                 }
 
                 string productID = line_seg[0];
-                V product = Bond(productID, CUSIP, g_tickers[productID], g_coupons[productID], g_dates[productID]);
+                V product = static_cast<V>(Bond(productID, CUSIP, g_tickers[productID], g_coupons[productID], g_dates[productID]));
                 string tradeID = line_seg[1];
                 string book = line_seg[2];
-                double price = FractionalToPrice(line_seg[3]);      // get the decimal price
+                double price;
+                try {
+                    price = ConvertFractionalToPrice(line_seg[3]);      // get the decimal price
+                } catch (const invalid_argument& e) {
+                    cerr << "Invalid argument: " << e.what() << endl;
+                    price = 0.0;
+                } catch (const out_of_range& e) {
+                    cerr << "Out of range: " << e.what() << endl;
+                    price = 0.0;
+                }
                 
                 long quantity = stol(line_seg[4]);
                 Side side;
@@ -271,7 +318,7 @@ public:
 
 // Connector to the pricing service
 template<typename V>
-class PricingConnector : public Connector<Price <V> >
+class PricingConnector : public Connector<Price<V>>
 {
 private:
     PricingService<V>* service;
@@ -311,8 +358,8 @@ public:
                     cout << cur_time << "  " << counter << " prices processed for " << productID << ".\n";
                 }
                 V product = Bond(productID, CUSIP, g_tickers[productID], g_coupons[productID], g_dates[productID]);
-                double bid = FractionalToPrice(line_seg[1]);
-                double ask = FractionalToPrice(line_seg[2]);
+                double bid = ConvertFractionalToPrice(line_seg[1]);
+                double ask = ConvertFractionalToPrice(line_seg[2]);
                 double mid = (bid + ask) / 2;
                 double spread = ask - bid;
 
@@ -333,7 +380,7 @@ public:
 
 // Connector to the market data service
 template<typename V>
-class MarketDataConnector : public Connector<OrderBook <V> >
+class MarketDataConnector : public Connector<OrderBook<V>>
 {
 private:
     MarketDataService<V>* service;
@@ -376,8 +423,8 @@ public:
                 vector<Order> bid_stack, offer_stack;
                 for (int i = 0; i < 5; i++)
                 {
-                    bid_price = FractionalToPrice(line_seg[2 * i + 1]);
-                    offer_price = FractionalToPrice(line_seg[2 * i + 2]);
+                    bid_price = ConvertFractionalToPrice(line_seg[2 * i + 1]);
+                    offer_price = ConvertFractionalToPrice(line_seg[2 * i + 2]);
                     bid_stack.push_back(Order(bid_price, 1000000 * (i + 1), BID));
                     offer_stack.push_back(Order(offer_price, 1000000 * (i + 1), OFFER));
                 }
@@ -399,7 +446,7 @@ public:
 
 // Connector to the inquiry service
 template<typename V>
-class InquiryConnector : public Connector<Inquiry<V> >
+class InquiryConnector : public Connector<Inquiry<V>>
 {
 private:
     InquiryService<V>* service;
@@ -443,7 +490,7 @@ public:
                 productID = line_seg[0];
                 inquiryID = line_seg[1];
                 V product = Bond(productID, CUSIP, g_tickers[productID], g_coupons[productID], g_dates[productID]);
-                double price = FractionalToPrice(line_seg[2]);
+                double price = ConvertFractionalToPrice(line_seg[2]);
                 long quantity = stol(line_seg[3]);
                 if (line_seg[4] == "BUY")
                     side = BUY;
