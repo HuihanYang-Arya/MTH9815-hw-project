@@ -1,5 +1,3 @@
-
-
 #ifndef PRODUCTS_HPP
 #define PRODUCTS_HPP
 
@@ -11,6 +9,7 @@ using namespace std;
 using namespace boost::gregorian;
 
 enum ProductType { IRSWAP, BOND };
+enum BondIdType { CUSIP, ISIN };
 
 /**
  * Base class for a product.
@@ -18,14 +17,14 @@ enum ProductType { IRSWAP, BOND };
 class Product
 {
 public:
-    // ctor for a prduct
+    // Constructor for a product
     Product() = default;
     Product(string _productId, ProductType _productType);
 
     // Get the product identifier
     const string& GetProductId() const;
 
-    // Ge the product type
+    // Get the product type
     ProductType GetProductType() const;
 
 private:
@@ -33,16 +32,13 @@ private:
     ProductType productType;
 };
 
-enum BondIdType { CUSIP, ISIN };
-
-
 /**
  * Bond product class
  */
 class Bond : public Product
 {
 public:
-    // ctor for a bond
+    // Constructor for a bond
     Bond() = default;
     Bond(string _productId, BondIdType _bondIdType, string _ticker, double _coupon, date _maturityDate);
 
@@ -62,18 +58,15 @@ public:
     friend ostream& operator<<(ostream& output, const Bond& bond);
 
 private:
-    string productId;
     BondIdType bondIdType;
     string ticker;
     double coupon;
     date maturityDate;
 };
 
+// Implementation of Product class methods
 Product::Product(string _productId, ProductType _productType)
-{
-    productId = _productId;
-    productType = _productType;
-}
+    : productId(_productId), productType(_productType) {}
 
 const string& Product::GetProductId() const
 {
@@ -85,13 +78,9 @@ ProductType Product::GetProductType() const
     return productType;
 }
 
-Bond::Bond(string _productId, BondIdType _bondIdType, string _ticker, double _coupon, date _maturityDate) : Product(_productId, BOND)
-{
-    bondIdType = _bondIdType;   
-    ticker = _ticker;
-    coupon = _coupon;
-    maturityDate = _maturityDate;
-}
+// Implementation of Bond class methods
+Bond::Bond(string _productId, BondIdType _bondIdType, string _ticker, double _coupon, date _maturityDate)
+    : Product(_productId, BOND), bondIdType(_bondIdType), ticker(_ticker), coupon(_coupon), maturityDate(_maturityDate) {}
 
 const string& Bond::GetTicker() const
 {
@@ -119,4 +108,4 @@ ostream& operator<<(ostream& output, const Bond& bond)
     return output;
 }
 
-#endif
+#endif // PRODUCTS_HPP

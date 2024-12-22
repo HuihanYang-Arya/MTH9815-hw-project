@@ -1,5 +1,3 @@
-
-
 #ifndef CONNECTORS_HPP
 #define CONNECTORS_HPP
 

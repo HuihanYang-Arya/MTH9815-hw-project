@@ -1,11 +1,18 @@
+/**
+ * @file AlgoStreamingService.hpp
+ * @brief Header file for the AlgoStreamingService class template.
+ *
+ * This file contains the definition of the AlgoStreamingService class template, which is responsible for managing and publishing two-way prices for financial products.
+ */
+
 #ifndef ALGO_STREAMING_SERVICE_HPP
 #define ALGO_STREAMING_SERVICE_HPP
 
 #include <map>
 #include <random>
 #include <string>
-#include "SOA.hpp"
-#include "Products.hpp"
+#include "utils/SOA.hpp"
+#include "utils/Products.hpp"
 #include "PricingService.hpp"
 #include "StreamingService.hpp"
 
@@ -40,6 +47,17 @@ void AlgoStreamingService<V>::OnMessage(PriceStream<V>& data)
     pricestreams[data.GetProduct().GetProductId()] = data;
 }
 
+/**
+ * @brief Publishes the price data to the streaming service.
+ * 
+ * This function takes a Price object, extracts the product, calculates the bid and ask prices,
+ * generates a random visible size for the orders, creates bid and ask PriceStreamOrder objects,
+ * and then creates a PriceStream object. The PriceStream object is stored in the pricestreams
+ * map and the service is notified with the new price stream.
+ * 
+ * @tparam V The type of the product.
+ * @param data The Price object containing the product and price information.
+ */
 template <typename V>
 void AlgoStreamingService<V>::PublishPrice(Price<V>& data)
 {

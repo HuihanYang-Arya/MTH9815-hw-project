@@ -1,3 +1,10 @@
+/**
+ * @file AlgoExecutionService.hpp
+ * @brief Header file for the AlgoExecutionService class template.
+ *
+ * This file contains the definition and implementation of the AlgoExecutionService class template,
+ * which is responsible for executing orders based on market data.
+ */
 
 #ifndef ALGO_EXECUTION_SERVICE_HPP
 #define ALGO_EXECUTION_SERVICE_HPP
@@ -48,6 +55,26 @@ void AlgoExecutionService<T>::OnMessage(ExecutionOrder<T>& data)
     execution_orders[data.GetOrderId()] = data;
 }
 
+/**
+ * @brief Executes an order based on the given OrderBook data.
+ *
+ * This function processes the bid and offer stacks from the provided OrderBook,
+ * determines the best bid and offer prices, and executes an order if the spread
+ * between the best bid and offer prices exceeds a predefined tolerance.
+ *
+ * @tparam T The type of the product being traded.
+ * @param data The OrderBook containing bid and offer stacks for the product.
+ *
+ * The function performs the following steps:
+ * 1. Retrieves the product from the OrderBook.
+ * 2. Extracts the bid and offer stacks from the OrderBook.
+ * 3. Identifies the best bid and offer prices from the stacks.
+ * 4. If the spread between the best bid and offer prices exceeds the tolerance,
+ *    it executes an order based on the current counter value (alternating between
+ *    bid and offer orders).
+ * 5. Creates an ExecutionOrder with the determined price, quantity, and side.
+ * 6. Stores the ExecutionOrder in the execution_orders map and notifies the service.
+ */
 template <typename T>
 void AlgoExecutionService<T>::ExecuteOrder(OrderBook<T>& data)
 {

@@ -1,4 +1,3 @@
-
 #ifndef PRICING_SERVICE_HPP
 #define PRICING_SERVICE_HPP
 

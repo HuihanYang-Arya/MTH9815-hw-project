@@ -1,5 +1,3 @@
-
-
 #ifndef SOA_HPP
 #define SOA_HPP
 

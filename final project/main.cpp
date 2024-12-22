@@ -1,5 +1,3 @@
-
-
 #include "DataGenerator.hpp"
 #include "AlgoExecutionService.hpp"
 #include "AlgoStreamingService.hpp"
@@ -20,18 +18,63 @@
 
 using namespace std;
 
+/**
+ * @brief Generates various types of financial data and saves them to files.
+ * 
+ * This function calls several other functions to generate different types of 
+ * financial data including trades, prices, market data, and inquiries. The 
+ * generated data is saved to corresponding text files in the "data_generated" 
+ * directory.
+ * 
+ * The following files are generated:
+ * - trades.txt: Contains generated trade data.
+ * - prices.txt: Contains generated price data.
+ * - marketdata.txt: Contains generated market data.
+ * - inquiries.txt: Contains generated inquiry data.
+ */
 void Generate_Data()
 {
-    Generate_Trades("trades.txt");
+    Generate_Trades("data_generated/trades.txt");
 
-    Generate_Prices("prices.txt");
+    Generate_Prices("data_generated/prices.txt");
 
-    Generate_Mktdata("marketdata.txt");
+    Generate_Mktdata("data_generated/marketdata.txt");
 
-    Generate_Inquiry("inquiries.txt");
+    Generate_Inquiry("data_generated/inquiries.txt");
 }
 
 
+/**
+ * @file main.cpp
+ * @brief Main entry point for the bond trading system.
+ *
+ * This program sets up various services and listeners to process bond trading data,
+ * including trade booking, position, risk, pricing, market data, execution, and inquiry services.
+ * It links these services together using listeners and connectors to process data from input files
+ * and generate output files.
+ *
+ * The main steps include:
+ * 1. Generating initial data.
+ * 2. Setting up services and linking them via listeners.
+ * 3. Processing price data to generate GUI and streaming outputs.
+ * 4. Processing order book data to generate execution, position, and risk outputs.
+ * 5. Processing inquiry data to generate an inquiry output.
+ * 6. Subscribing connectors to input files to fire up the system.
+ *
+ * Input files:
+ * - data_generated/trades.txt
+ * - data_generated/prices.txt
+ * - data_generated/marketdata.txt
+ * - data_generated/inquiries.txt
+ *
+ * Output files:
+ * - output/gui.txt
+ * - output/streaming.txt
+ * - output/executions.txt
+ * - output/positions.txt
+ * - output/risk.txt
+ * - output/all_inquiries.txt
+ */
 int main()
 {
     Generate_Data();       
@@ -58,12 +101,11 @@ int main()
     risk_service.AddListener(&historical_risk_listener);
 
     /*
-    * Part (b). Process price data from input/prices.txt
-    * Generate two output files: output/gui.txt and output/streaming.txt
+    * Process price data from data_generated/prices.txt
     * 
-    * prices.txt -> pricing service -> gui service -> gui.txt
-    * prices.txt -> pricing service -> also streaming service -> streaming service -> historical streaming service 
-       -> streaming.txt
+    * prices.txt -> pricing service -> GUI service -> output/gui.txt
+    * prices.txt -> pricing service -> algo streaming service -> streaming service -> historical streaming service 
+       -> output/streaming.txt
     */
 
     GUIService<Bond> gui_service;
@@ -88,9 +130,9 @@ int main()
     streaming_service.AddListener(&historical_streaming_listener);
 
     /*
-    * Part (c). Process order book data from input/marketorder.txt
-    * Generate one file: output/execution.txt
-    * Update two files: output/positions.txt and outpout/risk.txt
+    * Process order book data from data_generated/marketdata.txt
+    * Generate one file: output/executions.txt
+    * Update two files: output/positions.txt and output/risk.txt
     * 
     * marketdata.txt -> market data service -> algo execution service -> execution service -> historical execution
         service -> executions.txt
@@ -119,7 +161,7 @@ int main()
     execution_service.AddListener(&historical_execution_listener);
 
     /*
-    * Part (d). Process inquiry data from input/inquires.txt
+    *Process inquiry data from data_generated/inquires.txt
     * Generate one file: output/all_inquiries.txt
     * 
     * inquiries.txt -> inquiry service -> historical inquiry service -> all_inquiries.txt
@@ -131,16 +173,16 @@ int main()
     inquiry_service.AddListener(&historical_inquiry_listner);
 
 
-    // Fire up the system
+    // Run the system
     TradeBookingConnector<Bond> trade_connector(&trade_booking_service);
     PricingConnector<Bond> pricing_connector(&pricing_service);
     MarketDataConnector<Bond> market_data_connector(&market_data_service);
     InquiryConnector<Bond> inquiry_connector(&inquiry_service);
 
-    trade_connector.Subscribe("trades.txt");
-    pricing_connector.Subscribe("prices.txt");
-    market_data_connector.Subscribe("marketdata.txt");
-    inquiry_connector.Subscribe("inquiries.txt");
+    trade_connector.Subscribe("data_generated/trades.txt");
+    pricing_connector.Subscribe("data_generated/prices.txt");
+    market_data_connector.Subscribe("data_generated/marketdata.txt");
+    inquiry_connector.Subscribe("data_generated/inquiries.txt");
 
     return 0;
 }

@@ -1,8 +1,5 @@
-
-
 #ifndef GUISERVICE_HPP
 #define GUISERVICE_HPP
-
 #include <string>
 #include <map>
 #include <boost/date_time.hpp>

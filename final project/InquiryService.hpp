@@ -1,5 +1,3 @@
-
-
 #ifndef INQUIRY_SERVICE_HPP
 #define INQUIRY_SERVICE_HPP
 

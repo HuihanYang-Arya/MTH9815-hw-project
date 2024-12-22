@@ -1,5 +1,3 @@
-
-
 #ifndef DATA_GENERATOR_HPP
 #define DATA_GENERATOR_HPP
 
@@ -18,22 +16,37 @@ using namespace boost::gregorian;
 vector<string> g_product_Ids{ "OTRUSTR_02Y", "OTRUSTR_03Y","OTRUSTR_05Y","OTRUSTR_07Y",
 				"OTRUSTR_10Y","OTRUSTR_20Y","OTRUSTR_30Y" };
 
-map<string, string> g_tickers = { {"OTRUSTR_02Y","USB02Y"}, {"OTRUSTR_03Y","USB03Y"},
-							{"OTRUSTR_05Y","USB05Y"}, {"OTRUSTR_07Y","USB07Y"}, {"OTRUS_10Y","USB10Y"},
-							{"OTRUSTR_20Y","USB20Y"}, {"OTRUSTR_30Y","USB30Y"} };
+map<string, string> g_tickers = 
+								{ 
+									{"OTRUSTR_02Y","USB02Y"}, {"OTRUSTR_03Y","USB03Y"},
+									{"OTRUSTR_05Y","USB05Y"}, {"OTRUSTR_07Y","USB07Y"}, 
+									{"OTRUS_10Y","USB10Y"}, {"OTRUSTR_20Y","USB20Y"}, 
+									{"OTRUSTR_30Y","USB30Y"} 
+								};
 
-map<string, double> g_coupons = { {"OTRUSTR_02Y",0.00375}, {"OTRUSTR_03Y",0.00625 },
-							{"OTRUSTR_05Y",0.01500}, {"OTRUS_07Y",0.02250}, {"OTRUSTR_10Y",0.03125},
-							{"OTRUSTR_20Y",0.03750}, {"OTRUS_30Y",0.04375} };
+map<string, double> g_coupons = 
+								{ 
+									{"OTRUSTR_02Y",0.00375}, {"OTRUSTR_03Y",0.00625 },
+									{"OTRUSTR_05Y",0.01500}, {"OTRUS_07Y",0.02250}, 
+									{"OTRUSTR_10Y",0.03125}, {"OTRUSTR_20Y",0.03750}, 
+									{"OTRUS_30Y",0.04375} 
+								};
 
-map<string, double> g_PV01s = { {"OTRUSTR_02Y",0.019851}, {"OTRUSTR_03Y",0.029309},
-							{"OTRUSTR_05Y",0.048643}, {"OTRUSTR_07Y",0.065843}, {"OTRUSTR_10Y",0.087939},
-							{"OTRUSTR_20Y",0.123655}, {"OTRUSTR_30Y",0.184696} };
+map<string, double> g_PV01s = 
+								{
+									{"OTRUSTR_02Y",0.019851}, {"OTRUSTR_03Y",0.029309},
+									{"OTRUSTR_05Y",0.048643}, {"OTRUSTR_07Y",0.065843}, 
+									{"OTRUSTR_10Y",0.087939}, {"OTRUSTR_20Y",0.123655}, 
+									{"OTRUSTR_30Y",0.184696} 
+								};
 
-map<string, date> g_dates = { {"OTRUSTR_02Y",date(2024,12,31)}, {"OTRUSTR_03Y",date(2025,12,31)},
-							{"OTRUSTR_05Y",date(2027,12,31)}, {"OTRUSTR_07Y",date(2029,12,31)},
-							{"OTRUSTR_10Y",date(2032,12,31)}, {"OTRUSTR_20Y",date(2042,12,31)},
-							{"OTRUSTR_30Y",date(2052,12,31)} };
+map<string, date> g_dates = 
+								{ 
+									{"OTRUSTR_02Y",date(2024,12,31)}, {"OTRUSTR_03Y",date(2025,12,31)},
+									{"OTRUSTR_05Y",date(2027,12,31)}, {"OTRUSTR_07Y",date(2029,12,31)},
+									{"OTRUSTR_10Y",date(2032,12,31)}, {"OTRUSTR_20Y",date(2042,12,31)},
+									{"OTRUSTR_30Y",date(2052,12,31)}
+								};
 
 vector<string> books{ "TRSY1","TRSY2","TRSY3" };
 
