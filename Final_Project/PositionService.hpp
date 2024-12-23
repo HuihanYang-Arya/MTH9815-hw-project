@@ -91,7 +91,7 @@ template <typename T>
 double Position<T>::GetAggregatePosition()
 {
     double aggregate_pos = 0;
-    for (auto& p : positions)
+    for (const auto& p : positions)
     {
         aggregate_pos += p.second;
     }
@@ -120,6 +120,17 @@ void PositionService<T>::OnMessage(Position<T>& data)
     positions[data.GetProduct().GetProductId()] = data;
 }
 
+/**
+ * @brief Adds a trade to the position service.
+ * 
+ * This function processes a trade and updates the corresponding position
+ * in the position service. If the position for the product already exists,
+ * it updates the position with the new trade details. If the position does
+ * not exist, it creates a new position and inserts it into the position service.
+ * 
+ * @tparam T The type of the product.
+ * @param trade The trade to be added.
+ */
 template <typename T>
 void PositionService<T>::AddTrade(const Trade<T>& trade)
 {
@@ -129,9 +140,10 @@ void PositionService<T>::AddTrade(const Trade<T>& trade)
     double quantity = trade.GetQuantity();
     Side side = trade.GetSide();
 
-    if (positions.find(product_id) != positions.end())
+    auto it = positions.find(product_id);
+    if (it != positions.end())
     {
-        positions[product_id].UpdatePosition(book, quantity, side);
+        it->second.UpdatePosition(book, quantity, side);
     }
     else
     {

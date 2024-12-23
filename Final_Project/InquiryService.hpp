@@ -10,7 +10,7 @@
 enum InquiryState { RECEIVED, QUOTED, DONE, REJECTED, CUSTOMER_REJECTED };
 
 /**
- * Inquiry object modeling a customer inquiry from a client.
+ * Inquiry object models a customer inquiry from a client.
  * Type T is the product type.
  */
 template<typename T>
@@ -84,6 +84,17 @@ public:
 };
 
 
+/**
+ * @brief Constructor for the Inquiry class.
+ * 
+ * @tparam T The type of the product.
+ * @param _inquiryId The ID of the inquiry.
+ * @param _product The product associated with the inquiry.
+ * @param _side The side of the inquiry (buy or sell).
+ * @param _quantity The quantity of the product.
+ * @param _price The price of the product.
+ * @param _state The state of the inquiry.
+ */
 template<typename T>
 Inquiry<T>::Inquiry(string _inquiryId, const T& _product, Side _side, long _quantity, double _price, InquiryState _state) :
     product(_product)
@@ -151,6 +162,17 @@ Inquiry<T>& InquiryService<T>::GetData(string key)
     return inquiries[key];
 }
 
+/**
+ * @brief Handles incoming messages for inquiries.
+ * 
+ * This method processes an incoming inquiry message and updates the state of the inquiry
+ * based on its current state. If the inquiry state is RECEIVED, it sends a quote and notifies
+ * the listeners. If the inquiry state is QUOTED, it updates the state to DONE and notifies
+ * the listeners.
+ * 
+ * @tparam T The type of the product associated with the inquiry.
+ * @param data The inquiry data to be processed.
+ */
 template <typename T>
 void InquiryService<T>::OnMessage(Inquiry<T>& data)
 {
@@ -168,12 +190,25 @@ void InquiryService<T>::OnMessage(Inquiry<T>& data)
     }
 }
 
+/**
+ * @brief Sends a quote for a specific inquiry by setting its price.
+ * 
+ * @tparam T The type of the inquiry.
+ * @param inquiryId The ID of the inquiry to which the quote is being sent.
+ * @param price The price to be set for the inquiry.
+ */
 template <typename T>
 void InquiryService<T>::SendQuote(const string& inquiryId, double price)
 {
     inquiries[inquiryId].SetPrice(price);
 }
 
+/**
+ * @brief Rejects an inquiry by setting its state to REJECTED.
+ * 
+ * @tparam T The type of the inquiry.
+ * @param inquiryId The ID of the inquiry to be rejected.
+ */
 template <typename T>
 void InquiryService<T>::RejectInquiry(const string& inquiryId)
 {

@@ -11,12 +11,19 @@ using namespace std;
 enum PricingSide { BID, OFFER };
 
 
+/**
+ * @class Order
+ * @brief Represents a financial order with price, quantity, and side.
+ * 
+ * The Order class encapsulates the details of a financial order, including
+ * the price, quantity, and the side (buy/sell).
+ */
 class Order
 {
 public:
     // ctor for an order
     Order() = default;
-    Order(double _price, long _quantity, PricingSide _side);
+    Order(double price, long quantity, PricingSide side);
 
     // Get the price on the order
     double GetPrice() const;
@@ -36,7 +43,11 @@ private:
 
 
 /**
- * Class representing a bid and offer order
+ * @class BidOffer
+ * @brief Represents a bid and offer pair in a market.
+ *
+ * The BidOffer class encapsulates a bid order and an offer order, providing
+ * methods to access these orders.
  */
 class BidOffer
 {
@@ -110,15 +121,15 @@ public:
     const BidOffer& GetBestBidOffer(string productId);
 
     // Aggregate the order book
-    const OrderBook<T>& AggregateDepth(string productId);
+    OrderBook<T> AggregateDepth(string productId);
    
 };
 
-Order::Order(double _price, long _quantity, PricingSide _side)
+Order::Order(double price, long quantity, PricingSide side)
 {
-    price = _price;
-    quantity = _quantity;
-    side = _side;
+    this->price = price;
+    this->quantity = quantity;
+    this->side = side;
 }
 
 double Order::GetPrice() const
@@ -191,53 +202,75 @@ void MarketDataService<T>::OnMessage(OrderBook<T>& data)
     Service<string, OrderBook<T> >::Notify(data);
 }
 
+/**
+ * @brief Get the best bid and offer for a given product.
+ * 
+ * This function retrieves the best bid and offer prices from the order book
+ * for the specified product ID. It iterates through the bid and offer stacks
+ * to find the highest bid price and the lowest offer price.
+ * 
+ * @tparam T The type of the product.
+ * @param productId The ID of the product for which to get the best bid and offer.
+ * @return const BidOffer& A reference to a BidOffer object containing the best bid and offer.
+ */
 template <typename T>
 const BidOffer& MarketDataService<T>::GetBestBidOffer(string productId)
 {
     OrderBook<T> orderbook = orderbooks[productId];
+    if (orderbooks.find(productId) == orderbooks.end()) {
+        throw runtime_error("Product ID not found in orderbooks");
+    }
     vector<Order> bid_stack = orderbook.GetBidStack();
-    vector<Order> offer_stack = orderbook.GetOfferStack();
     Order best_bid = bid_stack[0];
+    vector<Order> offer_stack = orderbook.GetOfferStack();
     Order best_offer = offer_stack[0];
+    if (bid_stack.empty() || offer_stack.empty()) {
+        throw runtime_error("Bid or offer stack is empty");
+    }
 
     for (auto& e : bid_stack)
     {
         if (e.GetPrice() > best_bid.GetPrice())
             best_bid = e;
     }
-    for (auto& e : offer_stack)
-    {
-        if (e.GetPrice() < best_offer.GetPrice())
+    for (auto& e : offer_stack) {
+        if (e.GetPrice() < best_offer.GetPrice()) {
             best_offer = e;
+        }
     }
     return BidOffer(best_bid, best_offer);
 }
 
 template <typename T>
-const OrderBook<T>& MarketDataService<T>::AggregateDepth(string productId)
+OrderBook<T> MarketDataService<T>::AggregateDepth(string productId)
 {
+    if (orderbooks.find(productId) == orderbooks.end()) {
+        throw runtime_error("Product ID not found in orderbooks");
+    }
     T product = orderbooks[productId].GetProduct();
     vector<Order> bid_stack = orderbooks[productId].GetBidStack();
     vector<Order> offer_stack = orderbooks[productId].GetOfferStack();
 
     unordered_map<double, long> bid_map, offer_map;
-    for (auto& e : bid_stack)
+    for (auto& e : bid_stack) {
         bid_map[e.GetPrice()] += e.GetQuantity();
-    for (auto& e : offer_stack)
+    }
+    for (auto& e : offer_stack) {
         offer_map[e.GetPrice()] += e.GetQuantity();
+    }
 
     vector<Order> agg_bid_stack, agg_offer_stack;
-    for (auto& e : bid_map)
-    {
+    for (auto& e : bid_map) {
         Order bid(e.first, e.second, BID);
         agg_bid_stack.push_back(bid);
     }
-    for (auto& e : offer_map)
-    {
+    for (auto& e : offer_map) {
         Order offer(e.first, e.second, OFFER);
         agg_offer_stack.push_back(offer);
     }
     return OrderBook<T>(product, agg_bid_stack, agg_offer_stack);
 }
+
+    
 
 #endif

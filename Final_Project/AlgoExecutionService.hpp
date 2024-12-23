@@ -34,7 +34,7 @@ public:
 
     void OnMessage(ExecutionOrder<T>& data);
 
-    void ExecuteOrder(OrderBook<T>& data);
+    void ExecuteOrder(const OrderBook<T>& data);
 };
 
 template <typename T>
@@ -76,7 +76,7 @@ void AlgoExecutionService<T>::OnMessage(ExecutionOrder<T>& data)
  * 6. Stores the ExecutionOrder in the execution_orders map and notifies the service.
  */
 template <typename T>
-void AlgoExecutionService<T>::ExecuteOrder(OrderBook<T>& data)
+void AlgoExecutionService<T>::ExecuteOrder(const OrderBook<T>& data)
 {
     T product = data.GetProduct();
     vector<Order> bid_stack = data.GetBidStack();
@@ -95,25 +95,25 @@ void AlgoExecutionService<T>::ExecuteOrder(OrderBook<T>& data)
             best_offer = e;
     }
 
-    double price, quantity;
+    double orderPrice, orderQuantity;
     PricingSide side;
     if (!bid_stack.empty() && !offer_stack.empty() && (best_offer.GetPrice() - best_bid.GetPrice() > spread_tol))
     {
         if (counter % 2 == 0) // bid order
         {
-            price = best_bid.GetPrice();
-            quantity = best_bid.GetQuantity();
+            orderPrice = best_bid.GetPrice();
+            orderQuantity = best_bid.GetQuantity();
             side = BID;
         }
         else // offer order
         {
-            price = best_offer.GetPrice();
-            quantity = best_offer.GetQuantity();
+            orderPrice = best_offer.GetPrice();
+            orderQuantity = best_offer.GetQuantity();
             side = OFFER;
         }
 
-        string tradeID = "TRADEID_" + to_string(counter);
-        ExecutionOrder<T> execu_order(product, side, tradeID, MARKET, price, quantity, 2 * quantity, "", false);
+        string tradeId = "TRADEID_" + to_string(counter);
+        ExecutionOrder<T> execu_order(product, side, tradeId, MARKET, orderPrice, orderQuantity, 2 * orderQuantity, "", false);
         execution_orders[execu_order.GetOrderId()] = execu_order;
         ++counter;
         Service<string, ExecutionOrder<T>>::Notify(execu_order);

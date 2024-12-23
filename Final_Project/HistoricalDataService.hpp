@@ -11,6 +11,15 @@
 #include "InquiryService.hpp"
 #include "ExecutionService.hpp"
 
+/**
+ * @class HistoricalDataService
+ * @brief A service for handling historical data.
+ * 
+ * This class provides an interface for managing historical data, including
+ * retrieving data, handling new or updated data, and persisting data to a store.
+ * 
+ * @tparam T The type of data managed by the service.
+ */
 template<typename T>
 class HistoricalDataService : Service<string, T>
 {

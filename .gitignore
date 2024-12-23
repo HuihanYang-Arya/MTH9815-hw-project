@@ -1,5 +1,4 @@
-Final_Project/data_generated/prices.txt
-Final_Project/output/streaming.txt
-Final_Project/data_generated/marketdata.txt
+Final_Project/data_generated/*.txt
+Final_Project/output/*.txt
 
 

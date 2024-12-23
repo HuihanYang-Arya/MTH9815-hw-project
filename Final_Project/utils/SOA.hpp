@@ -6,10 +6,15 @@
 
 using namespace std;
 
+
 /**
- * Definition of a generic base class ServiceListener to listen to add, update, and remve
- * events on a Service. This listener should be registered on a Service for the Service
- * to notify all listeners for these events.
+ * @brief Abstract base class for service listeners.
+ * 
+ * This class defines the interface for listeners that respond to events in a service.
+ * It provides three pure virtual methods that must be implemented by derived classes
+ * to handle add, remove, and update events.
+ * 
+ * @tparam V The type of data that the listener will process.
  */
 template<typename V>
 class ServiceListener

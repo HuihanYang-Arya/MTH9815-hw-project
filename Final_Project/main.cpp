@@ -75,9 +75,14 @@ void Generate_Data()
  * - output/risk.txt
  * - output/all_inquiries.txt
  */
+void InitializeData()
+{
+    Generate_Data();
+}
+
 int main()
 {
-    Generate_Data();       
+    InitializeData();
 
     TradeBookingService<Bond> trade_booking_service;
     PositionService<Bond> position_service;
@@ -100,13 +105,13 @@ int main()
     // Link the risk service to the historical risk listener
     risk_service.AddListener(&historical_risk_listener);
 
-    /*
-    * Process price data from data_generated/prices.txt
-    * 
-    * prices.txt -> pricing service -> GUI service -> output/gui.txt
-    * prices.txt -> pricing service -> algo streaming service -> streaming service -> historical streaming service 
-       -> output/streaming.txt
-    */
+    /**
+     * Process price data from data_generated/prices.txt
+     * 
+     * data_generated/prices.txt -> pricing service -> GUI service -> output/gui.txt
+     * data_generated/prices.txt -> pricing service -> algo streaming service -> streaming service -> historical streaming service 
+        -> output/streaming.txt
+     */
 
     GUIService<Bond> gui_service;
     GUIServiceListener<Bond> gui_listener(&gui_service);
@@ -126,19 +131,19 @@ int main()
 
     HistoricalStreamingService<Bond> historical_streaming_service;
     HistoricalStreamingListener<Bond> historical_streaming_listener(&historical_streaming_service);
-    // Link the streaming service to the historcial streaming listener
+    // Link the streaming service to the historical streaming listener
     streaming_service.AddListener(&historical_streaming_listener);
 
-    /*
-    * Process order book data from data_generated/marketdata.txt
-    * Generate one file: output/executions.txt
-    * Update two files: output/positions.txt and output/risk.txt
-    * 
-    * marketdata.txt -> market data service -> algo execution service -> execution service -> historical execution
-        service -> executions.txt
-    * marketdata.txt -> market data service -> algo execution service -> execution service -> trade booking service
-        -> same as part (a)
-    */
+    /**
+     * Process order book data from data_generated/marketdata.txt
+     * Generate one file: output/executions.txt
+     * Update two files: output/positions.txt and output/risk.txt
+     * 
+     * data_generated/marketdata.txt -> market data service -> algo execution service -> execution service -> historical execution
+         service -> output/executions.txt
+     * data_generated/marketdata.txt -> market data service -> algo execution service -> execution service -> trade booking service
+         -> same as part (a)
+     */
 
     MarketDataService<Bond> market_data_service;
     AlgoExecutionService<Bond> algo_execution_service;
@@ -160,17 +165,17 @@ int main()
     // Link the execution service to the historical execution listener
     execution_service.AddListener(&historical_execution_listener);
 
-    /*
-    *Process inquiry data from data_generated/inquires.txt
-    * Generate one file: output/all_inquiries.txt
-    * 
-    * inquiries.txt -> inquiry service -> historical inquiry service -> all_inquiries.txt
-    */
+    /**
+     * Process inquiry data from data_generated/inquiries.txt
+     * Generate one file: output/all_inquiries.txt
+     * 
+     * data_generated/inquiries.txt -> inquiry service -> historical inquiry service -> output/all_inquiries.txt
+     */
 
     InquiryService<Bond> inquiry_service;
     HistoricalInquiryService<Bond> historical_inquiry_service;
-    HistoricalInquiryListener<Bond> historical_inquiry_listner(&historical_inquiry_service);
-    inquiry_service.AddListener(&historical_inquiry_listner);
+    HistoricalInquiryListener<Bond> historical_inquiry_listener(&historical_inquiry_service);
+    inquiry_service.AddListener(&historical_inquiry_listener);
 
 
     // Run the system

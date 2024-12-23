@@ -6,9 +6,50 @@
 #include "SOA.hpp"
 #include "MarketDataService.hpp"
 
- /**
-  * A price stream order with price and quantity (visible and hidden)
-  */
+/**
+ * @class PriceStreamOrder
+ * @brief Represents an order in a price stream with price, visible quantity, hidden quantity, and side.
+ * 
+ * This class encapsulates the details of a price stream order, including the price, visible quantity,
+ * hidden quantity, and the side (buy or sell) of the order.
+ */
+
+/**
+ * @brief Default constructor for PriceStreamOrder.
+ */
+ 
+/**
+ * @brief Parameterized constructor for PriceStreamOrder.
+ * 
+ * @param price The price of the order.
+ * @param visibleQuantity The visible quantity of the order.
+ * @param hiddenQuantity The hidden quantity of the order.
+ * @param side The side (buy or sell) of the order.
+ */
+
+/**
+ * @brief Get the side of the order.
+ * 
+ * @return The side of the order.
+ */
+
+/**
+ * @brief Get the price of the order.
+ * 
+ * @return The price of the order.
+ */
+
+/**
+ * @brief Get the visible quantity of the order.
+ * 
+ * @return The visible quantity of the order.
+ */
+
+/**
+ * @brief Get the hidden quantity of the order.
+ * 
+ * @return The hidden quantity of the order.
+ */
 class PriceStreamOrder
 {
 public:
@@ -87,12 +128,12 @@ public:
 };
 
 
-PriceStreamOrder::PriceStreamOrder(double _price, long _visibleQuantity, long _hiddenQuantity, PricingSide _side)
+PriceStreamOrder::PriceStreamOrder(double price, long visibleQuantity, long hiddenQuantity, PricingSide side)
 {
-    price = _price;
-    visibleQuantity = _visibleQuantity;
-    hiddenQuantity = _hiddenQuantity;
-    side = _side;
+    price = price;
+    visibleQuantity = visibleQuantity;
+    hiddenQuantity = hiddenQuantity;
+    side = side;
 }
 
 PricingSide PriceStreamOrder::GetSide() const

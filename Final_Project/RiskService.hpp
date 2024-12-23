@@ -88,7 +88,7 @@ public:
     void AddPosition(Position<T>& position);
 
     // Get the bucketed risk for the bucket sector
-    const PV01<BucketedSector<T>>& GetBucketedRisk(const BucketedSector<T>& _sector) const;
+    PV01<BucketedSector<T>> GetBucketedRisk(const BucketedSector<T>& _sector) const;
 
 };
 
@@ -158,6 +158,17 @@ void RiskService<T>::OnMessage(PV01<T>& data)
     pv01s[data.GetProduct().GetProductId()] = data;
 }
 
+/**
+ * @brief Adds a position to the RiskService and updates the PV01 for the product.
+ * 
+ * @tparam T The type of the product.
+ * @param position The position to be added.
+ * 
+ * This function retrieves the product from the given position, obtains its product ID,
+ * and calculates the aggregate position quantity. It then uses the global PV01 value
+ * for the product to create a new PV01 object, which is stored in the pv01s map.
+ * Finally, it notifies the service with the new PV01 object.
+ */
 template <typename T>
 void RiskService<T>::AddPosition(Position<T>& position)
 {
@@ -171,17 +182,27 @@ void RiskService<T>::AddPosition(Position<T>& position)
     Service<string, PV01 <T> >::Notify(new_pv01);
 }
 
+/**
+ * @brief Get the bucketed risk for a given sector.
+ * 
+ * This function calculates the PV01 (Price Value of a Basis Point) for a given 
+ * BucketedSector by summing up the PV01 values of all products within the sector.
+ * 
+ * @tparam T The type of the product in the sector.
+ * @param sector The BucketedSector for which the bucketed risk is to be calculated.
+ * @return A PV01 object containing the BucketedSector and its calculated PV01 value.
+ */
 template<typename T>
-const PV01<BucketedSector<T>>& RiskService<T>::GetBucketedRisk(const BucketedSector<T>& sector) const
+PV01<BucketedSector<T>> RiskService<T>::GetBucketedRisk(const BucketedSector<T>& sector) const
 {
-    BucketedSector<T> product = sector;
+    BucketedSector<T> bucketedSector = sector;
     double pv01 = 0;
     for (auto& p : sector.GetProducts())
     {
         string id = p.GetProductId();
         pv01 += (pv01s[id].GetPV01() * pv01s[id].GetQuantity());
     }
-    return PV01<BucketedSector<T>>(product, pv01, 1);
+    return PV01<BucketedSector<T>>(bucketedSector, pv01, 1);
 }
 
 #endif
